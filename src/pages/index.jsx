@@ -1,14 +1,44 @@
-import { Search, MapPin, House, Heart, User } from "lucide-react";
+import Card from "@/components/Card";
+import { Search, MapPin } from "lucide-react";
 import { PuffLoader } from "react-spinners";
-import useSWR from "swr";
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
-
+import { useEffect, useState } from "react";
 const WeatherApp = () => {
-  const { data, error, isLoading } = useSWR(
-    `https://countriesnow.space/api/v0.1/countries`,
-    fetcher
+  const [weather, setWeather] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [cityName, setCityName] = useState("Tokyo");
+  const weatherApiKey = "899d9c2c0f5845838dc70138240912";
+  const [countries, setCountries] = useState([]);
+
+  useEffect(
+    () => {
+      setIsLoading(true);
+
+      fetch(
+        `https://api.weatherapi.com/v1/forecast.json?key=${weatherApiKey}&q=${cityName}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          setWeather(data);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+      fetch("https://countriesnow.space/api/v0.1/countries")
+        .then((response) => response.json())
+        .then((data) => {
+          setCountries(data);
+        });
+    },
+    [cityName],
+    [countries]
   );
-  console.log(data);
+
+  const changeCity = (city) => {
+    setCityName(city);
+    setInputValue("");
+  };
+
   if (isLoading) {
     return (
       <div className=" w-screen h-screen flex relative bg-[#F3F4F6]">
@@ -26,53 +56,57 @@ const WeatherApp = () => {
         </div>
         {/* backside */}
         <div className=" bg-[url(/bg.png)] bg-no-repeat bg-center bg-cover w-1/2 h-full flex justify-center items-center relative ">
-          <PuffLoader />
+          <PuffLoader color="white" />
         </div>
       </div>
     );
   }
+  // console.log(weather);
 
   return (
     <div className=" w-screen h-screen flex relative bg-[#F3F4F6]">
-      <div className="bg-[#F3F4F6] w-1/2 h-full flex justify-center items-center relative z-10 ">
-        <img
-          src="orangeEclipse.png"
-          alt="orangeEclipse"
-          className="absolute z-0 w-[128px] top-[10%] left-[25%]"
-        />
-        <div className="w-[567px] bg-[#FFFFFFBF] h-[80px] rounded-[48px] flex items-center px-6 py-4 gap-4 absolute left-10 top-10">
-          <Search size={48} />
+      <div className="w-[567px]  flex flex-col  gap-4 absolute left-10 top-10 z-30">
+        <div className="flex items-center h-[80px] rounded-[48px] px-6 py-4  bg-[#FFFFFFBF] gap-4">
+          <Search size={48} color="gray" />
           <input
             type="search"
             className=" w-full h-full focus:outline-0 text-[32px] font-bold"
             placeholder="Search"
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+            }}
           />
         </div>
-        <div className="w-[414px]  bg-[#FFFFFFBF] rounded-[48px] p-12 flex flex-col items-center gap-12 absolute z-30 shadow-xl backdrop-blur-md">
-          <div className=" w-full ">
-            <p className=" text-lg text-[#111827] font-medium">
-              September 10, 2021
-            </p>
-            <div className="flex justify-between">
-              <p className=" text-[#111827] text-5xl font-extrabold">Kraków</p>
-              <MapPin size={32} color="black" />
-            </div>
+
+        {inputValue ? (
+          <div className="px-6 py-4  bg-[#FFFFFFBF] rounded-[24px] flex flex-col gap-8">
+            {countries?.data &&
+              countries.data
+                .flatMap((country) =>
+                  country?.cities?.filter(
+                    (city) =>
+                      city.toLowerCase().includes(inputValue.toLowerCase()) &&
+                      inputValue !== ""
+                  )
+                )
+                .slice(0, 4)
+                .map((city) => (
+                  <div
+                    key={city}
+                    className="flex items-center gap-4"
+                    onClick={() => changeCity(city)}
+                  >
+                    <MapPin color="gray" size={40} />
+                    <p className="font-bold text-[28px]">{city}</p>
+                  </div>
+                ))}
           </div>
-          <img src="sun.png" alt="" className="size-[260px] " />
-          <div className="w-full ">
-            <p className=" bg-gradient-to-b   from-[#111827] to-[#6B7280] bg-clip-text text-[144px]  text-transparent font-extrabold">
-              26°
-            </p>
-            <p className="text-[#FF8E27] text-2xl font-extrabold">Bright</p>
-          </div>
-          <div className=" w-full flex justify-between">
-            <House size={32} color="black" />
-            <MapPin size={32} color="gray" />
-            <Heart size={32} color="gray" />
-            <User size={32} color="gray" />
-          </div>
-        </div>
+        ) : (
+          ""
+        )}
       </div>
+      <Card isDark={false} weather={weather} />
       <div className="absolute left-[50%] flex justify-center items-center top-[50%] z-10 place-items-center">
         <div className="size-[940px] rounded-[50%] border border-white  opacity-30 flex justify-center items-center absolute"></div>
         <div className="size-[540px] rounded-[50%] border border-white  opacity-30 flex justify-center items-center absolute"></div>
@@ -82,38 +116,8 @@ const WeatherApp = () => {
           <img src="logoRight.png" alt="" className="h-[86px]" />
         </div>
       </div>
-      {/* backside */}
-      <div className=" bg-[url(/bg.png)] bg-no-repeat bg-center bg-cover w-1/2 h-full flex justify-center items-center relative ">
-        <div className="w-[414px]  bg-[#111827BF] rounded-[48px] p-12 flex flex-col items-center gap-12 absolute z-10 shadow-xl backdrop-blur-md">
-          <div className=" w-full ">
-            <p className=" text-lg text-[#9CA3AF] font-medium">
-              September 10, 2021
-            </p>
-            <div className="flex justify-between">
-              <p className=" text-white text-5xl font-extrabold">Kraków</p>
-              <MapPin size={32} color="gray" />
-            </div>
-          </div>
-          <img src="moon.png" alt="" className="size-[260px]" />
-          <div className="w-full">
-            <p className=" bg-gradient-to-b  from-[#F9FAFB] to-[#111827] text-transparent bg-clip-text text-[144px] font-extrabold">
-              17°
-            </p>
-            <p className="text-[#777CCE] text-2xl font-extrabold">Clear</p>
-          </div>
-          <div className=" w-full flex justify-between">
-            <House size={32} color="white" />
-            <MapPin size={32} color="gray" />
-            <Heart size={32} color="gray" />
-            <User size={32} color="gray" />
-          </div>
-        </div>
-        <img
-          src="violetEclipse.png"
-          alt="violetEclipse"
-          className="absolute z-0 w-[128px] bottom-[10%] right-[25%] "
-        />
-      </div>
+
+      <Card isDark weather={weather} />
     </div>
   );
 };
