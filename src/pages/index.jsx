@@ -24,6 +24,7 @@ const WeatherApp = () => {
         .finally(() => {
           setIsLoading(false);
         });
+
       fetch("https://countriesnow.space/api/v0.1/countries")
         .then((response) => response.json())
         .then((data) => {
@@ -65,8 +66,8 @@ const WeatherApp = () => {
 
   return (
     <div className=" w-screen h-screen flex relative bg-[#F3F4F6]">
-      <div className="w-[567px]  flex flex-col  gap-4 absolute left-10 top-10 z-30">
-        <div className="flex items-center h-[80px] rounded-[48px] px-6 py-4  bg-[#FFFFFFBF] gap-4">
+      <div className="w-[567px]  flex flex-col   absolute left-10 top-10 z-30">
+        <div className="flex items-center h-[80px] rounded-[48px] px-6 py-4  bg-[#FFFFFFBF] gap-4 mb-4">
           <Search size={48} color="gray" />
           <input
             type="search"
@@ -78,9 +79,8 @@ const WeatherApp = () => {
             }}
           />
         </div>
-
-        {inputValue ? (
-          <div className="px-6 py-4  bg-[#FFFFFFBF] rounded-[24px] flex flex-col gap-8">
+        {inputValue !== "" ? (
+          <div className="py-4 rounded-[20px]  bg-[#FFFFFFBF]">
             {countries?.data &&
               countries.data
                 .flatMap((country) =>
@@ -94,7 +94,7 @@ const WeatherApp = () => {
                 .map((city) => (
                   <div
                     key={city}
-                    className="flex items-center gap-4"
+                    className="flex items-center gap-4 bg-[#FFFFFFBF] hover:bg-[#e2e1e1bf] px-6 py-4  cursor-pointer transition-all duration-300 ease-in-out"
                     onClick={() => changeCity(city)}
                   >
                     <MapPin color="gray" size={40} />
