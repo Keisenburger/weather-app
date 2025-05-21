@@ -6,7 +6,7 @@ const WeatherApp = () => {
   const [weather, setWeather] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [cityName, setCityName] = useState("Tokyo");
+  const [cityName, setCityName] = useState("Ulaanbaatar");
   const weatherApiKey = "899d9c2c0f5845838dc70138240912";
   const [countries, setCountries] = useState([]);
 
@@ -62,12 +62,12 @@ const WeatherApp = () => {
       </div>
     );
   }
-  // console.log(weather);
+  console.log(countries);
 
   return (
     <div className=" w-screen h-screen flex relative bg-[#F3F4F6]">
       <div className="w-[567px]  flex flex-col   absolute left-10 top-10 z-30">
-        <div className="flex items-center h-[80px] rounded-[48px] px-6 py-4  bg-[#FFFFFFBF] gap-4 mb-4">
+        <div className="flex items-center h-[80px] rounded-[48px] px-6 py-4  bg-[#FFFFFFBF] gap-4 mb-4 shadow-md">
           <Search size={48} color="gray" />
           <input
             type="search"
@@ -80,7 +80,7 @@ const WeatherApp = () => {
           />
         </div>
         {inputValue !== "" ? (
-          <div className="py-4 rounded-[20px]  bg-[#FFFFFFBF]">
+          <div className="py-4 rounded-[20px]  bg-[#FFFFFFBF] shadow-sm">
             {countries?.data &&
               countries.data
                 .flatMap((country) =>
@@ -90,7 +90,7 @@ const WeatherApp = () => {
                       inputValue !== ""
                   )
                 )
-                .slice(0, 4)
+                .slice(0, 3)
                 .map((city) => (
                   <div
                     key={city}
